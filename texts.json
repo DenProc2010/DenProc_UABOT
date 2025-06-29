@@ -1,0 +1,42 @@
+{
+  "welcome": {
+    "ua": "Оберіть мову / Choose your language:",
+    "en": "Choose your language / Оберіть мову:"
+  },
+  "start": {
+    "ua": "Hello, world! 🖥️\nЯ — особистий бот Den_ProcUA. Коджу, дебажу.\n\nТут можна глянути мої проєкти, почитати коротко про мене — і навіть написати напряму (ну типу як в support, але без тикетів 😅)\n\nЩо покажемо?",
+    "en": "Hello, world! 🖥️\nI'm the personal bot of Den_ProcUA. I code, debug.\n\nHere you can check out my projects, learn a bit about me — and even message me directly (kind of like support, but without the tickets 😅)\n\nWhat do you want to see?"
+  },
+  "help": {
+    "ua": "/start — Почати знайомство\n/help — Ця підказка\n/about — Про мене\n/news — Новини\n/contact — Написати адміну",
+    "en": "/start — Start\n/help — This help\n/about — About me\n/news — News\n/contact — Contact admin"
+  },
+  "banned": {
+    "ua": "⛔ Ви були забанені й не можете писати адміну.",
+    "en": "⛔ You are banned and cannot contact the admin."
+  },
+  "contact_start": {
+    "ua": "Напиши своє повідомлення, я передам його адміну. Щоб завершити — /end",
+    "en": "Write your message, I will send it to the admin. To end — /end"
+  },
+  "end_done": {
+    "ua": "Сесію завершено. Якщо захочеш знову щось написати — використай /contact.",
+    "en": "Session ended. If you want to write again, use /contact."
+  },
+  "end_none": {
+    "ua": "У тебе наразі немає активної сесії.",
+    "en": "You don't have an active session right now."
+  },
+  "contact_command_blocked": {
+    "ua": "❗ Команди недоступні під час сесії. Завершіть сесію командою /end.",
+    "en": "❗ Commands are not allowed during a session. Please end the session with /end."
+  },
+  "contact_sent": {
+    "ua": "✅ Повідомлення надіслано. Напиши ще або заверш сесію /end",
+    "en": "✅ Message sent. You can send more or end the session with /end"
+  },
+  "about": {
+    "ua": "Привіт! Я — бот Den_ProcUA, який допомагає спілкуватися з адміністратором, слідкувати за новинами та багато іншого.",
+    "en": "Hello! I am the Den_ProcUA bot, helping you communicate with admin, follow news, and more."
+  }
+}
