@@ -1,9 +1,8 @@
 import telebot
 import json
-import os
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
-bot = telebot.TeleBot(os.getenv("7174297217:AAG1uJkTUsnNpf7fEwk6mk3XyeF22JLE4Ew"))
+bot = telebot.TeleBot("7174297217:AAG1uJkTUsnNpf7fEwk6mk3XyeF22JLE4Ew")
 
 user_language = {}
 contact_sessions = {}
@@ -188,5 +187,4 @@ def unban_user(message):
     except:
         bot.send_message(message.chat.id, get_text('unban_usage', message.from_user.id))
 
-print("Ти найкрасивіша дівчина!!!")
 bot.infinity_polling()
