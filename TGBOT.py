@@ -17,7 +17,7 @@ threading.Thread(target=run_flask).start()
 
 # === Telegram БОТ ===
 
-bot = telebot.TeleBot("YOUR_TOKEN_HERE")  # 🔁 Заміни на свій токен
+bot = telebot.TeleBot("7174297217:AAG1CVX2m35Uo0rUSwk7RIS_6y__zI7-AMg")  # 🔁 Заміни на свій токен
 
 user_language = {}
 contact_sessions = {}
