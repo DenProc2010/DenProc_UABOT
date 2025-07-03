@@ -1,12 +1,14 @@
 import telebot
 import json
+import os
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
-bot = telebot.TeleBot("7174297217:AAG1uJkTUsnNpf7fEwk6mk3XyeF22JLE4Ew")
+bot = telebot.TeleBot(os.getenv("7174297217:AAG1uJkTUsnNpf7fEwk6mk3XyeF22JLE4Ew"))
 
 user_language = {}
 contact_sessions = {}
 ADMINS = [2133347662]
+
 
 
 def load_news():
