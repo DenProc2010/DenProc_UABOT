@@ -2,7 +2,7 @@ import telebot
 import json
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
-bot = telebot.TeleBot("7174297217:AAG1uJkTUsnNpf7fEwk6mk3XyeF22JLE4Ew")
+bot = telebot.TeleBot("7174297217:AAGEWCtQuxDM1pPhaYNdpTywRPfRewbIo1I")
 
 user_language = {}
 contact_sessions = {}
