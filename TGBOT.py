@@ -1,14 +1,27 @@
 import telebot
 import json
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
+from flask import Flask
+import threading
 
-bot = telebot.TeleBot("7174297217:AAGEWCtQuxDM1pPhaYNdpTywRPfRewbIo1I")
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "1"
+
+def run_flask():
+    app.run(host="0.0.0.0", port=8080)
+
+threading.Thread(target=run_flask).start()
+
+# === Telegram БОТ ===
+
+bot = telebot.TeleBot("YOUR_TOKEN_HERE")  # 🔁 Заміни на свій токен
 
 user_language = {}
 contact_sessions = {}
 ADMINS = [2133347662]
-
-
 
 def load_news():
     try:
@@ -20,14 +33,12 @@ def load_news():
             "en": {"text": "No news available", "comment": ""}
         }
 
-
 def save_news(data):
     with open("news.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 def is_banned(user_id):
-    banned = load_banned_users()
-    return user_id in banned
+    return user_id in load_banned_users()
 
 def load_banned_users():
     try:
@@ -36,52 +47,44 @@ def load_banned_users():
     except FileNotFoundError:
         return []
 
-
 def save_banned_users(banned_list):
     with open("banned_users.json", "w", encoding="utf-8") as f:
         json.dump(banned_list, f)
-
 
 def load_texts():
     with open("texts.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
-
 def get_lang(user_id):
     return user_language.get(user_id, 'ua')
-
 
 def get_text(key, user_id):
     lang = get_lang(user_id)
     return texts.get(key, {}).get(lang, '')
 
-
 texts = load_texts()
 
 @bot.message_handler(func=lambda message: is_banned(message.from_user.id))
 def banned_user_handler(message):
-    lang = get_lang(message.from_user.id)
     bot.send_message(message.chat.id, get_text('banned', message.from_user.id))
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("\U0001F1FA\U0001F1E6 Українська"), KeyboardButton("\U0001F1EC\U0001F1E7 English"))
+    markup.add(KeyboardButton("🇺🇦 Українська"), KeyboardButton("🇬🇧 English"))
     bot.send_message(message.chat.id, texts['welcome']['ua'], reply_markup=markup)
 
-
-@bot.message_handler(func=lambda m: m.text in ["\U0001F1FA\U0001F1E6 Українська", "\U0001F1EC\U0001F1E7 English"])
+@bot.message_handler(func=lambda m: m.text in ["🇺🇦 Українська", "🇬🇧 English"])
 def language_select_handler(message):
     lang = 'ua' if "Українська" in message.text else 'en'
     user_language[message.from_user.id] = lang
     bot.send_message(message.chat.id, texts['start'][lang])
 
-
 @bot.message_handler(commands=['news'])
 def news_handler(message):
     user_id = message.from_user.id
     lang = get_lang(user_id)
-    news_data = load_news()  # ця функція читає news.json
+    news_data = load_news()
     news_text = news_data.get(lang, {}).get("text", "Новини відсутні" if lang == "ua" else "No news available")
     bot.send_message(message.chat.id, news_text)
 
@@ -89,21 +92,18 @@ def news_handler(message):
 def help_handler(message):
     bot.send_message(message.chat.id, get_text('help', message.from_user.id))
 
-
 @bot.message_handler(commands=['about'])
 def about_handler(message):
     bot.send_message(message.chat.id, get_text('about', message.from_user.id))
 
-
 @bot.message_handler(commands=['contact'])
 def contact_handler(message):
     user_id = message.from_user.id
-    if user_id in load_banned_users():
+    if is_banned(user_id):
         bot.send_message(message.chat.id, get_text('banned', user_id))
         return
     contact_sessions[user_id] = True
     bot.send_message(message.chat.id, get_text('contact_start', user_id))
-
 
 @bot.message_handler(commands=['end'])
 def end_contact_session(message):
@@ -114,7 +114,6 @@ def end_contact_session(message):
     else:
         bot.send_message(message.chat.id, get_text('end_none', user_id))
 
-
 @bot.message_handler(func=lambda m: m.from_user.id in contact_sessions)
 def handle_contact_session(message):
     user_id = message.from_user.id
@@ -123,9 +122,8 @@ def handle_contact_session(message):
         return
     user_name = message.from_user.username or message.from_user.first_name
     for admin_id in ADMINS:
-        bot.send_message(admin_id, f"\U0001F4E9 Повідомлення від @{user_name} (id: {user_id}):\n\n{message.text}")
+        bot.send_message(admin_id, f"📩 Повідомлення від @{user_name} (id: {user_id}):\n\n{message.text}")
     bot.send_message(message.chat.id, get_text('contact_sent', user_id))
-
 
 @bot.message_handler(commands=['reply'])
 def reply_handler(message):
@@ -143,11 +141,10 @@ def reply_handler(message):
         bot.send_message(message.chat.id, get_text('reply_usage', user_id))
         return
     try:
-        bot.send_message(target_user_id, f"\U0001F4EC {get_text('admin_reply_prefix', target_user_id)}\n\n{reply_text}")
+        bot.send_message(target_user_id, f"📬 {get_text('admin_reply_prefix', target_user_id)}\n\n{reply_text}")
         bot.send_message(message.chat.id, get_text('reply_success', user_id).format(user_id=target_user_id))
     except Exception as e:
         bot.send_message(message.chat.id, get_text('reply_fail', user_id).format(error=e))
-
 
 @bot.message_handler(commands=['ban'])
 def ban_user(message):
@@ -169,7 +166,6 @@ def ban_user(message):
     except:
         bot.send_message(message.chat.id, get_text('ban_usage', message.from_user.id))
 
-
 @bot.message_handler(commands=['unban'])
 def unban_user(message):
     if message.from_user.id not in ADMINS:
@@ -187,4 +183,5 @@ def unban_user(message):
     except:
         bot.send_message(message.chat.id, get_text('unban_usage', message.from_user.id))
 
+# === Запуск бота ===
 bot.infinity_polling()
