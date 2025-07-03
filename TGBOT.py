@@ -3,6 +3,7 @@ import json
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from flask import Flask
 import threading
+import os
 
 app = Flask(__name__)
 
@@ -11,13 +12,14 @@ def home():
     return "1"
 
 def run_flask():
-    app.run(host="0.0.0.0", port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
 
 threading.Thread(target=run_flask).start()
 
-# === Telegram БОТ ===
+# === TELEGRAM BOT ===
 
-bot = telebot.TeleBot("7174297217:AAG1CVX2m35Uo0rUSwk7RIS_6y__zI7-AMg")  # 🔁 Заміни на свій токен
+bot = telebot.TeleBot("7174297217:AAG1CVX2m35Uo0rUSwk7RIS_6y__zI7-AMg")
 
 user_language = {}
 contact_sessions = {}
@@ -125,27 +127,6 @@ def handle_contact_session(message):
         bot.send_message(admin_id, f"📩 Повідомлення від @{user_name} (id: {user_id}):\n\n{message.text}")
     bot.send_message(message.chat.id, get_text('contact_sent', user_id))
 
-@bot.message_handler(commands=['reply'])
-def reply_handler(message):
-    user_id = message.from_user.id
-    if user_id not in ADMINS:
-        bot.send_message(message.chat.id, get_text('admin_only', user_id))
-        return
-    try:
-        parts = message.text.split(maxsplit=2)
-        if len(parts) < 3:
-            raise ValueError("Недостатньо аргументів")
-        target_user_id = int(parts[1])
-        reply_text = parts[2]
-    except:
-        bot.send_message(message.chat.id, get_text('reply_usage', user_id))
-        return
-    try:
-        bot.send_message(target_user_id, f"📬 {get_text('admin_reply_prefix', target_user_id)}\n\n{reply_text}")
-        bot.send_message(message.chat.id, get_text('reply_success', user_id).format(user_id=target_user_id))
-    except Exception as e:
-        bot.send_message(message.chat.id, get_text('reply_fail', user_id).format(error=e))
-
 @bot.message_handler(commands=['ban'])
 def ban_user(message):
     if message.from_user.id not in ADMINS:
@@ -183,5 +164,7 @@ def unban_user(message):
     except:
         bot.send_message(message.chat.id, get_text('unban_usage', message.from_user.id))
 
-# === Запуск бота ===
-bot.infinity_polling()
+def run_bot():
+    bot.infinity_polling()
+
+threading.Thread(target=run_bot).start()
