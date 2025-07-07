@@ -22,6 +22,10 @@
     "ua": "Напиши своє повідомлення, я передам його адміну. Зверни увагу, що стікери, файли та інші мультимедіа не підтримуються.\nЩоб завершити спілкування — /end",
     "en": "Write your message, I will send it to the admin. Note that stickers, files, and other media are not supported.\nTo end the conversation — /end"
   },
+  "contact_warning": {
+    "ua": "⚠️ Зверніть увагу: бот не підтримує стікери, файли та інші мультимедіа. Надсилайте лише текстові повідомлення.",
+    "en": "⚠️ Please note: the bot does not support stickers, files, or other media. Please send text messages only."
+  },
   "end_done": {
     "ua": "Сесію завершено. Якщо захочеш знову щось написати — використай /contact.",
     "en": "Session ended. If you want to write again, use /contact."
@@ -41,6 +45,14 @@
   "unknown_type": {
     "ua": "Не підтримуваний тип повідомлення.",
     "en": "Unsupported message type."
+  },
+  "unsupported_content": {
+    "ua": "Бот підтримує лише текстові повідомлення.",
+    "en": "The bot supports text messages only."
+  },
+  "topic_deleted": {
+    "ua": "Гілка звернення була видалена. Спробуйте написати /contact знову.",
+    "en": "The contact thread was deleted. Please try /contact again."
   },
   "admin_unknown": {
     "ua": "Адміністратор надіслав повідомлення у незрозумілому форматі.",

@@ -17,7 +17,7 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-TOKEN = "7174297217:AAFp_YoCAaB66132kyHXSorZ5NJZ_ogJ_Zs"
+TOKEN = "7174297217:AAFSf48NpeywggT02VdKtC_kfUmVV_i88Bo"
 GROUP_ID = -1002454855038
 TOPICS_FILE = "topics.json"
 BANNED_FILE = "banned_users.json"
@@ -129,8 +129,8 @@ def contact_handler(message):
             bot.send_message(message.chat.id, get_text('contact_error').format(error=e))
             return
 
-    warning = get_text('contact_warning')
     start_msg = get_text('contact_start', user_id)
+    warning = get_text('contact_warning')
     bot.send_message(message.chat.id, f"{start_msg}\n\n{warning}")
 
 @bot.message_handler(commands=['end'])
