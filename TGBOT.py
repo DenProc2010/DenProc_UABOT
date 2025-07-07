@@ -1,6 +1,6 @@
 import telebot
 import json
-from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from flask import Flask
 import threading
 import os
@@ -95,10 +95,7 @@ def help_handler(message):
 
 @bot.message_handler(commands=['about'])
 def about_handler(message):
-    markup = InlineKeyboardMarkup()
-    instagram_url = "https://www.instagram.com/denproc_ua/"
-    markup.add(InlineKeyboardButton("Мій Instagram 📸", url=instagram_url))
-    bot.send_message(message.chat.id, get_text('about', message.from_user.id), reply_markup=markup)
+    bot.send_message(message.chat.id, get_text('about', message.from_user.id))
 
 @bot.message_handler(commands=['news'])
 def news_handler(message):
