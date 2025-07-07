@@ -1,23 +1,26 @@
 {
   "welcome": {
-    "ua": "Оберіть мову / Choose your language:",
-    "en": "Choose your language / Оберіть мову:"
+    "ua": "Вітаю! Оберіть будь ласка мову\nHello there! Please choose language"
   },
   "start": {
     "ua": "Hello, world! 🖥️\nЯ — особистий бот Den_ProcUA. Коджу, дебажу.\n\nТут можна глянути мої проєкти, почитати коротко про мене — і навіть написати напряму (ну типу як в support, але без тикетів 😅)\n\nЩо покажемо?",
     "en": "Hello, world! 🖥️\nI'm the personal bot of Den_ProcUA. I code, debug.\n\nHere you can check out my projects, learn a bit about me — and even message me directly (kind of like support, but without the tickets 😅)\n\nWhat do you want to see?"
   },
   "help": {
-    "ua": "/start — Почати знайомство\n/help — Ця підказка\n/about — Про мене\n/news — Новини\n/contact — Написати адміну",
-    "en": "/start — Start\n/help — This help\n/about — About me\n/news — News\n/contact — Contact admin"
+    "ua": "/start - Запустити бота\n/help - Показати всі команди\n/about - Дізнатись щось про DenProc_UA\n/news - Останні новини\n/contact - Зв'язатись з DenProc_UA\n/end - Завершити спілкування з DenProc_UA",
+    "en": "/start - To start bot\n/help - To see all commands\n/about - To see information about DenProc_UA\n/news - Latest news\n/contact - To contact DenProc_UA\n/end - To end conversation with DenProc_UA"
   },
   "banned": {
     "ua": "⛔ Ви були забанені й не можете писати адміну.",
     "en": "⛔ You are banned and cannot contact the admin."
   },
+  "contact_private": {
+    "ua": "🛑 Цю команду можна використовувати лише у приваті з ботом.",
+    "en": "🛑 This command is only available in private chat with the bot."
+  },
   "contact_start": {
-    "ua": "Напиши своє повідомлення, я передам його адміну. Щоб завершити — /end",
-    "en": "Write your message, I will send it to the admin. To end — /end"
+    "ua": "Напиши своє повідомлення, я передам його адміну. Зверни увагу, що стікери, файли та інші мультимедіа не підтримуються.\nЩоб завершити спілкування — /end",
+    "en": "Write your message, I will send it to the admin. Note that stickers, files, and other media are not supported.\nTo end the conversation — /end"
   },
   "end_done": {
     "ua": "Сесію завершено. Якщо захочеш знову щось написати — використай /contact.",
@@ -27,13 +30,37 @@
     "ua": "У тебе наразі немає активної сесії.",
     "en": "You don't have an active session right now."
   },
-  "contact_command_blocked": {
-    "ua": "❗ Команди недоступні під час сесії. Завершіть сесію командою /end.",
-    "en": "❗ Commands are not allowed during a session. Please end the session with /end."
-  },
   "contact_sent": {
-    "ua": "✅ Повідомлення надіслано. Напиши ще або заверш сесію /end",
-    "en": "✅ Message sent. You can send more or end the session with /end"
+    "ua": "✅ Повідомлення надіслано. Можеш написати ще або завершити спілкування командою /end",
+    "en": "✅ Message sent. You can send more or end the conversation with /end"
+  },
+  "contact_error": {
+    "ua": "Помилка при створенні теми: {error}",
+    "en": "Error creating topic: {error}"
+  },
+  "unknown_type": {
+    "ua": "Не підтримуваний тип повідомлення.",
+    "en": "Unsupported message type."
+  },
+  "admin_unknown": {
+    "ua": "Адміністратор надіслав повідомлення у незрозумілому форматі.",
+    "en": "Admin sent a message in an unknown format."
+  },
+  "ban_success": {
+    "ua": "Користувача забанено.",
+    "en": "User has been banned."
+  },
+  "already_banned": {
+    "ua": "Користувач вже у бані.",
+    "en": "User is already banned."
+  },
+  "unban_success": {
+    "ua": "Користувача розбанено.",
+    "en": "User has been unbanned."
+  },
+  "not_banned": {
+    "ua": "Користувач не був забанений.",
+    "en": "User was not banned."
   },
   "about": {
     "ua": "Привіт! Я — бот Den_ProcUA, який допомагає спілкуватися з адміністратором, слідкувати за новинами та багато іншого.",
