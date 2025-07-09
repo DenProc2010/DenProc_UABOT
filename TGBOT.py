@@ -32,7 +32,7 @@ def load_json_file(filename, default):
     try:
         with open(filename, "r", encoding="utf-8") as f:
             return json.load(f)
-    except FileNotFoundError:
+    except:
         return default
 
 def save_json_file(filename, data):
@@ -64,8 +64,7 @@ def save_news(data):
     save_json_file(NEWS_FILE, data)
 
 def is_banned(user_id):
-    banned = load_banned_users()
-    return user_id in banned
+    return user_id in load_banned_users()
 
 texts = load_texts()
 
@@ -119,7 +118,7 @@ def contact_handler(message):
     topics = load_topics()
     thread_id = topics.get(user_id_str)
 
-    if not thread_id:
+    if not isinstance(thread_id, int):
         try:
             username = message.from_user.username or message.from_user.first_name
             topic_name = f"Звернення: @{username} (id: {user_id})"
@@ -128,7 +127,7 @@ def contact_handler(message):
             topics[user_id_str] = thread_id
             save_topics(topics)
         except Exception as e:
-            bot.send_message(message.chat.id, get_text('contact_error').format(error=e))
+            bot.send_message(message.chat.id, get_text('contact_error', user_id).format(error=e))
             return
 
     warning = get_text('contact_warning', user_id)
@@ -158,7 +157,7 @@ def forward_user_message(message):
 
     thread_id = topics.get(user_id_str)
 
-    if not thread_id:
+    if not isinstance(thread_id, int):
         try:
             username = message.from_user.username or message.from_user.first_name
             topic_name = f"Звернення: @{username} (id: {user_id})"
@@ -171,14 +170,12 @@ def forward_user_message(message):
             return
 
     try:
-        print(f"[INFO] Forwarding message from user {user_id} type: {message.content_type}")
         if message.content_type == 'text':
             bot.send_message(GROUP_ID, f"\U0001F4E9 @{message.from_user.username or message.from_user.first_name} (id: {user_id}):\n{message.text}", message_thread_id=thread_id)
             bot.send_message(message.chat.id, get_text("contact_sent", user_id))
         else:
-            bot.send_message(GROUP_ID, get_text('unsupported_content', user_id), message_thread_id=thread_id)
+            bot.send_message(message.chat.id, get_text('unsupported_content', user_id))
     except Exception as e:
-        print(f"[ERROR] Failed to forward message: {e}")
         if "message thread not found" in str(e).lower():
             topics.pop(user_id_str, None)
             save_topics(topics)
@@ -188,12 +185,14 @@ def forward_user_message(message):
 
 @bot.message_handler(func=lambda m: m.chat.id == GROUP_ID and m.message_thread_id is not None)
 def admin_reply_handler(message):
+    if message.from_user.id not in ADMINS:
+        return
+
     topics = load_topics()
     for user_id_str, thread_id in topics.items():
-        if int(thread_id) == message.message_thread_id:
+        if thread_id == message.message_thread_id:
             user_id = int(user_id_str)
-            if message.from_user.id not in ADMINS:
-                return
+
             if message.text and message.text.strip().lower() == "/ban":
                 banned = load_banned_users()
                 if user_id not in banned:
@@ -203,6 +202,7 @@ def admin_reply_handler(message):
                 else:
                     bot.send_message(GROUP_ID, get_text("already_banned", user_id), message_thread_id=thread_id)
                 return
+
             if message.text and message.text.strip().lower() == "/unban":
                 banned = load_banned_users()
                 if user_id in banned:
@@ -212,8 +212,8 @@ def admin_reply_handler(message):
                 else:
                     bot.send_message(GROUP_ID, get_text("not_banned", user_id), message_thread_id=thread_id)
                 return
+
             try:
-                print(f"[INFO] Admin replying to user {user_id}, type: {message.content_type}")
                 if message.content_type == 'text':
                     bot.send_message(user_id, f"\U0001F4AC Адміністратор: {message.text}")
                 else:
