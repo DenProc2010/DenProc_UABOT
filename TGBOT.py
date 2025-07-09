@@ -117,17 +117,15 @@ def contact_handler(message):
         return
 
     topics = load_topics()
+    thread_id = topics.get(user_id_str)
 
-    try:
-        if user_id_str not in topics:
-            raise ValueError("No topic")
-        bot.send_message(GROUP_ID, ".", message_thread_id=topics[user_id_str])
-    except Exception:
+    if not thread_id:
         try:
             username = message.from_user.username or message.from_user.first_name
             topic_name = f"Звернення: @{username} (id: {user_id})"
             topic = bot.create_forum_topic(GROUP_ID, name=topic_name)
-            topics[user_id_str] = topic.message_thread_id
+            thread_id = topic.message_thread_id
+            topics[user_id_str] = thread_id
             save_topics(topics)
         except Exception as e:
             bot.send_message(message.chat.id, get_text('contact_error').format(error=e))
