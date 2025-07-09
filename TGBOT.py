@@ -17,7 +17,7 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = "7174297217:AAHCU10To0l9Ff_aQlUXNtGybwZlX3cB8L0"
 GROUP_ID = -1002454855038
 TOPICS_FILE = "topics.json"
 BANNED_FILE = "banned_users.json"
