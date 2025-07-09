@@ -118,7 +118,11 @@ def contact_handler(message):
 
     topics = load_topics()
 
-    if user_id_str not in topics:
+    try:
+        if user_id_str not in topics:
+            raise ValueError("No topic")
+        bot.send_message(GROUP_ID, ".", message_thread_id=topics[user_id_str])
+    except Exception:
         try:
             username = message.from_user.username or message.from_user.first_name
             topic_name = f"Звернення: @{username} (id: {user_id})"
@@ -129,7 +133,7 @@ def contact_handler(message):
             bot.send_message(message.chat.id, get_text('contact_error').format(error=e))
             return
 
-    warning = get_text('contact_warning')
+    warning = get_text('contact_warning', user_id)
     start_msg = get_text('contact_start', user_id)
     bot.send_message(message.chat.id, f"{start_msg}\n\n{warning}")
 
