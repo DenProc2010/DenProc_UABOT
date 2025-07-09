@@ -27,7 +27,6 @@ ADMINS = [2133347662]
 
 bot = telebot.TeleBot(TOKEN)
 user_language = {}
-ended_sessions = set()  # Зберігає user_id користувачів, які завершили сесію
 
 def load_json_file(filename, default):
     try:
@@ -116,10 +115,6 @@ def contact_handler(message):
         bot.send_message(message.chat.id, get_text('banned', user_id))
         return
 
-    # При новому /contact видаляємо користувача з ended_sessions
-    if user_id in ended_sessions:
-        ended_sessions.remove(user_id)
-
     topics = load_topics()
     thread_id = topics.get(user_id_str)
 
@@ -141,25 +136,18 @@ def contact_handler(message):
 
 @bot.message_handler(commands=['end'])
 def end_contact_session(message):
-    user_id = message.from_user.id
-    user_id_str = str(user_id)
-
+    user_id_str = str(message.from_user.id)
     topics = load_topics()
     if user_id_str in topics:
         topics.pop(user_id_str)
         save_topics(topics)
-
-    ended_sessions.add(user_id)
-    bot.send_message(message.chat.id, get_text('end_done', user_id))
+        bot.send_message(message.chat.id, get_text('end_done', message.from_user.id))
+    else:
+        bot.send_message(message.chat.id, get_text('end_none', message.from_user.id))
 
 @bot.message_handler(func=lambda m: m.chat.type == 'private')
 def forward_user_message(message):
     user_id = message.from_user.id
-
-    if user_id in ended_sessions:
-        # Сесія завершена, не пересилати адміну
-        return
-
     user_id_str = str(user_id)
     topics = load_topics()
     banned = load_banned_users()
@@ -233,5 +221,10 @@ def admin_reply_handler(message):
             except Exception as e:
                 print(f"[ERROR] Failed to send message to user {user_id}: {e}")
             break
+
+# Перевірка існування topics.json при запуску — створюємо пустий, якщо немає
+if not os.path.isfile(TOPICS_FILE):
+    with open(TOPICS_FILE, "w", encoding="utf-8") as f:
+        f.write("{}")
 
 bot.infinity_polling()
