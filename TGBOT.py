@@ -17,7 +17,7 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-TOKEN = "7174297217:AAHCU10To0l9Ff_aQlUXNtGybwZlX3cB8L0"
+TOKEN = "7174297217:AAF-UolUISCMPhmEX8_7oU0cjVe5RJNmA7g"
 GROUP_ID = -1002454855038
 TOPICS_FILE = "topics.json"
 BANNED_FILE = "banned_users.json"
@@ -155,8 +155,11 @@ def forward_user_message(message):
     if user_id in banned:
         return
 
-    thread_id = topics.get(user_id_str)
+    # Якщо тема відсутня, не пересилаємо повідомлення (сесія закінчена)
+    if user_id_str not in topics:
+        return
 
+    thread_id = topics.get(user_id_str)
     if not isinstance(thread_id, int):
         try:
             username = message.from_user.username or message.from_user.first_name
@@ -221,10 +224,5 @@ def admin_reply_handler(message):
             except Exception as e:
                 print(f"[ERROR] Failed to send message to user {user_id}: {e}")
             break
-
-# Перевірка існування topics.json при запуску — створюємо пустий, якщо немає
-if not os.path.isfile(TOPICS_FILE):
-    with open(TOPICS_FILE, "w", encoding="utf-8") as f:
-        f.write("{}")
 
 bot.infinity_polling()
