@@ -155,11 +155,8 @@ def forward_user_message(message):
     if user_id in banned:
         return
 
-    # Якщо тема відсутня, не пересилаємо повідомлення (сесія закінчена)
-    if user_id_str not in topics:
-        return
-
     thread_id = topics.get(user_id_str)
+
     if not isinstance(thread_id, int):
         try:
             username = message.from_user.username or message.from_user.first_name
@@ -224,5 +221,44 @@ def admin_reply_handler(message):
             except Exception as e:
                 print(f"[ERROR] Failed to send message to user {user_id}: {e}")
             break
+
+# --- Новини: оновлення новин через послідовний ввід ---
+
+@bot.message_handler(commands=['update_news'])
+def update_news_handler(message):
+    user_id = message.from_user.id
+    if user_id not in ADMINS:
+        bot.send_message(message.chat.id, "Вибач, ця команда тільки для адміністратора.")
+        return
+
+    msg = bot.send_message(message.chat.id, "Введи новий текст новини українською:")
+    bot.register_next_step_handler(msg, process_news_ua)
+
+def process_news_ua(message):
+    ua_text = message.text
+    msg = bot.send_message(message.chat.id, "Тепер введи коментар для новини українською:")
+    bot.register_next_step_handler(msg, process_news_ua_comment, ua_text)
+
+def process_news_ua_comment(message, ua_text):
+    ua_comment = message.text
+    msg = bot.send_message(message.chat.id, "Введи новий текст новини англійською:")
+    bot.register_next_step_handler(msg, process_news_en, ua_text, ua_comment)
+
+def process_news_en(message, ua_text, ua_comment):
+    en_text = message.text
+    msg = bot.send_message(message.chat.id, "Тепер введи коментар для новини англійською:")
+    bot.register_next_step_handler(msg, process_news_en_comment, ua_text, ua_comment, en_text)
+
+def process_news_en_comment(message, ua_text, ua_comment, en_text):
+    en_comment = message.text
+
+    news = load_news()
+    news['ua']['text'] = ua_text
+    news['ua']['comment'] = ua_comment
+    news['en']['text'] = en_text
+    news['en']['comment'] = en_comment
+
+    save_news(news)
+    bot.send_message(message.chat.id, "✅ Новини успішно оновлено!")
 
 bot.infinity_polling()
