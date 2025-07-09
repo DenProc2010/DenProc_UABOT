@@ -19,8 +19,8 @@
     "en": "🛑 This command is only available in private chat with the bot."
   },
   "contact_start": {
-    "ua": "Напиши своє повідомлення, я передам його адміну. Зверни увагу, що стікери, файли та інші мультимедіа не підтримуються.\nЩоб завершити спілкування — /end",
-    "en": "Write your message, I will send it to the admin. Note that stickers, files, and other media are not supported.\nTo end the conversation — /end"
+    "ua": "Напиши своє повідомлення, я передам його адміну. \nЩоб завершити спілкування — /end",
+    "en": "Write your message, I will send it to the admin. \nTo end the conversation — /end"
   },
   "contact_warning": {
     "ua": "⚠️ Зверніть увагу: бот не підтримує стікери, файли та інші мультимедіа. Надсилайте лише текстові повідомлення.",
@@ -77,5 +77,29 @@
   "about": {
     "ua": "Привіт! Я — бот Den_ProcUA, який допомагає спілкуватися з адміністратором, слідкувати за новинами та багато іншого.",
     "en": "Hello! I am the Den_ProcUA bot, helping you communicate with admin, follow news, and more."
+  },
+   "update_admin_only": {
+    "ua": "⛔ Вибач, ця команда лише для адміністратора.",
+    "en": "⛔ Sorry, this command is for administrators only."
+  },
+  "update_prompt_ua": {
+    "ua": "Введи новий текст новини українською:",
+    "en": "Enter the new news text in Ukrainian:"
+  },
+  "update_prompt_ua_comment": {
+    "ua": "Тепер введи коментар для новини українською:",
+    "en": "Now enter the comment for the news in Ukrainian:"
+  },
+  "update_prompt_en": {
+    "ua": "Введи новий текст новини англійською:",
+    "en": "Enter the new news text in English:"
+  },
+  "update_prompt_en_comment": {
+    "ua": "Тепер введи коментар для новини англійською:",
+    "en": "Now enter the comment for the news in English:"
+  },
+  "update_success": {
+    "ua": "✅ Новини успішно оновлено!",
+    "en": "✅ News successfully updated!"
   }
 }

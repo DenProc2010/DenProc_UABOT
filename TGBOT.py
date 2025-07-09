@@ -17,7 +17,7 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-TOKEN = "7174297217:AAFSf48NpeywggT02VdKtC_kfUmVV_i88Bo"
+TOKEN = "7174297217:AAHl8-qqljCZfD9VHGsjy5h7NYmbas0ZgTI"
 GROUP_ID = -1002454855038
 TOPICS_FILE = "topics.json"
 BANNED_FILE = "banned_users.json"
@@ -26,7 +26,6 @@ TEXTS_FILE = "texts.json"
 ADMINS = [2133347662]
 
 bot = telebot.TeleBot(TOKEN)
-
 user_language = {}
 
 def load_json_file(filename, default):
@@ -44,7 +43,15 @@ def load_texts():
     return load_json_file(TEXTS_FILE, {})
 
 def load_topics():
-    return load_json_file(TOPICS_FILE, {})
+    data = load_json_file(TOPICS_FILE, {})
+    updated = False
+    for user_id, value in list(data.items()):
+        if isinstance(value, int):
+            data[user_id] = {"thread_id": value, "status": "open"}
+            updated = True
+    if updated:
+        save_topics(data)
+    return data
 
 def save_topics(data):
     save_json_file(TOPICS_FILE, data)
@@ -118,27 +125,34 @@ def contact_handler(message):
         return
 
     topics = load_topics()
-    if user_id_str not in topics:
-        try:
-            username = message.from_user.username or message.from_user.first_name
-            topic_name = f"Звернення: @{username} (id: {user_id})"
-            topic = bot.create_forum_topic(GROUP_ID, name=topic_name)
-            topics[user_id_str] = topic.message_thread_id
-            save_topics(topics)
-        except Exception as e:
-            bot.send_message(message.chat.id, get_text('contact_error').format(error=e))
-            return
+    user_topic = topics.get(user_id_str)
 
-    start_msg = get_text('contact_start', user_id)
-    warning = get_text('contact_warning')
-    bot.send_message(message.chat.id, f"{start_msg}\n\n{warning}")
+    if user_topic and user_topic.get('status') == 'open':
+        # Якщо сесія активна, просто надіслати стартове повідомлення, нову тему не створюємо
+        bot.send_message(message.chat.id, get_text('contact_start', user_id))
+        return
+
+    try:
+        username = message.from_user.username or message.from_user.first_name
+        topic_name = f"Звернення: @{username} (id: {user_id})"
+        topic = bot.create_forum_topic(GROUP_ID, name=topic_name)
+        topics[user_id_str] = {"thread_id": topic.message_thread_id, "status": "open"}
+        save_topics(topics)
+    except Exception as e:
+        bot.send_message(message.chat.id, get_text('contact_error').format(error=e))
+        return
+
+    bot.send_message(message.chat.id, get_text('contact_start', user_id))
 
 @bot.message_handler(commands=['end'])
 def end_contact_session(message):
     user_id_str = str(message.from_user.id)
     topics = load_topics()
-    if user_id_str in topics:
-        topics.pop(user_id_str)
+    user_topic = topics.get(user_id_str)
+
+    if user_topic and user_topic.get('status') == 'open':
+        user_topic['status'] = 'closed'
+        topics[user_id_str] = user_topic
         save_topics(topics)
         bot.send_message(message.chat.id, get_text('end_done', message.from_user.id))
     else:
@@ -153,7 +167,8 @@ def forward_user_message(message):
     if message.from_user.id in banned:
         return
 
-    thread_id = topics.get(user_id_str)
+    user_topic = topics.get(user_id_str)
+    thread_id = user_topic.get('thread_id') if user_topic else None
 
     if not thread_id:
         try:
@@ -161,7 +176,7 @@ def forward_user_message(message):
             topic_name = f"Звернення: @{username} (id: {message.from_user.id})"
             topic = bot.create_forum_topic(GROUP_ID, name=topic_name)
             thread_id = topic.message_thread_id
-            topics[user_id_str] = thread_id
+            topics[user_id_str] = {"thread_id": thread_id, "status": "open"}
             save_topics(topics)
         except Exception as e:
             bot.send_message(message.chat.id, f"Помилка створення теми: {e}")
@@ -185,8 +200,8 @@ def forward_user_message(message):
 @bot.message_handler(func=lambda m: m.chat.id == GROUP_ID and m.message_thread_id is not None)
 def admin_reply_handler(message):
     topics = load_topics()
-    for user_id_str, thread_id in topics.items():
-        if thread_id == message.message_thread_id:
+    for user_id_str, topic_data in topics.items():
+        if topic_data.get('thread_id') == message.message_thread_id:
             user_id = int(user_id_str)
             if message.from_user.id not in ADMINS:
                 return
@@ -195,18 +210,18 @@ def admin_reply_handler(message):
                 if user_id not in banned:
                     banned.append(user_id)
                     save_banned_users(banned)
-                    bot.send_message(GROUP_ID, get_text("ban_success", user_id), message_thread_id=thread_id)
+                    bot.send_message(GROUP_ID, get_text("ban_success", user_id), message_thread_id=message.message_thread_id)
                 else:
-                    bot.send_message(GROUP_ID, get_text("already_banned", user_id), message_thread_id=thread_id)
+                    bot.send_message(GROUP_ID, get_text("already_banned", user_id), message_thread_id=message.message_thread_id)
                 return
             if message.text and message.text.strip().lower() == "/unban":
                 banned = load_banned_users()
                 if user_id in banned:
                     banned.remove(user_id)
                     save_banned_users(banned)
-                    bot.send_message(GROUP_ID, get_text("unban_success", user_id), message_thread_id=thread_id)
+                    bot.send_message(GROUP_ID, get_text("unban_success", user_id), message_thread_id=message.message_thread_id)
                 else:
-                    bot.send_message(GROUP_ID, get_text("not_banned", user_id), message_thread_id=thread_id)
+                    bot.send_message(GROUP_ID, get_text("not_banned", user_id), message_thread_id=message.message_thread_id)
                 return
             try:
                 print(f"[INFO] Admin replying to user {user_id}, type: {message.content_type}")
