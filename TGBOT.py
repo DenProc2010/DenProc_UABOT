@@ -17,7 +17,7 @@ def run_flask():
 
 threading.Thread(target=run_flask).start()
 
-TOKEN = "7174297217:AAHCU10To0l9Ff_aQlUXNtGybwZlX3cB8L0"
+TOKEN = "YOUR_BOT_TOKEN"
 GROUP_ID = -1002454855038
 TOPICS_FILE = "topics.json"
 BANNED_FILE = "banned_users.json"
@@ -150,11 +150,12 @@ def end_contact_session(message):
 
 @bot.message_handler(func=lambda m: m.chat.type == 'private')
 def forward_user_message(message):
-    user_id_str = str(message.from_user.id)
+    user_id = message.from_user.id
+    user_id_str = str(user_id)
     topics = load_topics()
     banned = load_banned_users()
 
-    if message.from_user.id in banned:
+    if user_id in banned:
         return
 
     thread_id = topics.get(user_id_str)
@@ -162,7 +163,7 @@ def forward_user_message(message):
     if not thread_id:
         try:
             username = message.from_user.username or message.from_user.first_name
-            topic_name = f"Звернення: @{username} (id: {message.from_user.id})"
+            topic_name = f"Звернення: @{username} (id: {user_id})"
             topic = bot.create_forum_topic(GROUP_ID, name=topic_name)
             thread_id = topic.message_thread_id
             topics[user_id_str] = thread_id
@@ -172,17 +173,18 @@ def forward_user_message(message):
             return
 
     try:
-        print(f"[INFO] Forwarding message from user {message.from_user.id} type: {message.content_type}")
+        print(f"[INFO] Forwarding message from user {user_id} type: {message.content_type}")
         if message.content_type == 'text':
-            bot.send_message(GROUP_ID, f"\U0001F4E9 @{message.from_user.username or message.from_user.first_name} (id: {message.from_user.id}):\n{message.text}", message_thread_id=thread_id)
+            bot.send_message(GROUP_ID, f"\U0001F4E9 @{message.from_user.username or message.from_user.first_name} (id: {user_id}):\n{message.text}", message_thread_id=thread_id)
+            bot.send_message(message.chat.id, get_text("contact_sent", user_id))
         else:
-            bot.send_message(GROUP_ID, get_text('unsupported_content', message.from_user.id), message_thread_id=thread_id)
+            bot.send_message(GROUP_ID, get_text('unsupported_content', user_id), message_thread_id=thread_id)
     except Exception as e:
         print(f"[ERROR] Failed to forward message: {e}")
         if "message thread not found" in str(e).lower():
             topics.pop(user_id_str, None)
             save_topics(topics)
-            bot.send_message(message.chat.id, get_text('topic_deleted', message.from_user.id))
+            bot.send_message(message.chat.id, get_text('topic_deleted', user_id))
         else:
             bot.send_message(message.chat.id, f"Помилка надсилання повідомлення адміну: {e}")
 
@@ -190,7 +192,7 @@ def forward_user_message(message):
 def admin_reply_handler(message):
     topics = load_topics()
     for user_id_str, thread_id in topics.items():
-        if thread_id == message.message_thread_id:
+        if int(thread_id) == message.message_thread_id:
             user_id = int(user_id_str)
             if message.from_user.id not in ADMINS:
                 return
