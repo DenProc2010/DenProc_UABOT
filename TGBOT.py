@@ -43,7 +43,18 @@ def load_texts():
     return load_json_file(TEXTS_FILE, {})
 
 def load_topics():
-    return load_json_file(TOPICS_FILE, {})
+    raw_topics = load_json_file(TOPICS_FILE, {})
+    # Нормалізуємо структуру: якщо тема — об'єкт, беремо thread_id, якщо int — залишаємо як є
+    topics = {}
+    for user_id_str, topic_data in raw_topics.items():
+        if isinstance(topic_data, dict) and 'thread_id' in topic_data:
+            topics[user_id_str] = topic_data['thread_id']
+        elif isinstance(topic_data, int):
+            topics[user_id_str] = topic_data
+        else:
+            # Якщо формат несподіваний — пропускаємо або видаляємо
+            pass
+    return topics
 
 def save_topics(data):
     save_json_file(TOPICS_FILE, data)
